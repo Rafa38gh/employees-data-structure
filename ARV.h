@@ -101,10 +101,10 @@ void InsereArv(Arv *a, int registro, char nome[], char cargo[], int idade, float
 void Imprime_PreOrder(NoArv *pai)
 {
     printf("\n %d", pai->registro);
-    printf("\t\t %s", pai->nome);
-    printf("\t\t %s", pai->cargo);
-    printf("\t\t %d", pai->idade);
-    printf("\t\t %.2f", pai->salario);
+    printf("\t%s", pai->nome);
+    printf("\t%s", pai->cargo);
+    printf("\t%d", pai->idade);
+    printf("\t%.2f", pai->salario);
 
     if(pai->dir != NULL)
     {
