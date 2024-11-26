@@ -37,6 +37,27 @@ int VaziaArv(Arv *a)
     return 0;
 }
 
+void FormataNo(NoArv *no)
+{
+    int nomeLen, cargoLen;
+
+    // Formatação do vetor nome
+    nomeLen = strlen(no->nome);
+    for(int i = nomeLen; i < TAM_NOME; i++)
+    {
+        no->nome[i] = ' ';
+    }
+    no->nome[39] = '\0';
+
+    // Formatação do vetor cargo
+    cargoLen = strlen(no->cargo);
+    for(int i = cargoLen; i < TAM_CARGO; i++)
+    {
+        no->cargo[i] = ' ';
+    }
+    no->cargo[24] = '\0';
+}
+
 NoArv *InsereAux(NoArv *no, int registro, char nome[], char cargo[], int idade, float salario)
 {
     int flag;
@@ -51,6 +72,7 @@ NoArv *InsereAux(NoArv *no, int registro, char nome[], char cargo[], int idade, 
 
     novo->esq = NULL;
     novo->dir = NULL;
+    FormataNo(novo);
 
     if(no == NULL)
     {
@@ -112,24 +134,6 @@ NoArv *InsereAux(NoArv *no, int registro, char nome[], char cargo[], int idade, 
 
 void InsereArv(Arv *a, int registro, char nome[], char cargo[], int idade, float salario)
 {
-    int nomeLen, cargoLen;
-
-    // Formatação do vetor nome
-    nomeLen = strlen(nome);
-    for(int i = nomeLen; i < TAM_NOME; i++)
-    {
-        nome[i] = ' ';
-    }
-    nome[39] = '\0';
-
-    // Formatação do vetor cargo
-    cargoLen = strlen(cargo);
-    for(int i = cargoLen; i < TAM_CARGO; i++)
-    {
-        cargo[i] = ' ';
-    }
-    cargo[24] = '\0';
-
     a->raiz = InsereAux(a->raiz, registro, nome, cargo, idade, salario);
 }
 

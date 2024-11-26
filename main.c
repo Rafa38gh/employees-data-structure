@@ -41,8 +41,8 @@ void LeituraARQ(Arv *a)
 
 void NovoCadastro(Arv *a)
 {
-    int n, registro, idade;
-    int cargoOps, cargoLen, nomeLen;
+    int registro, idade;
+    int cargoOps;
     char nome[40], cargo[25];
     float salario;
 
@@ -125,9 +125,82 @@ void NovoCadastro(Arv *a)
     InsereArv(a, registro, nome, cargo, idade, salario);
 }
 
-EditarFuncionario(NoArv *cadastro)
+void EditarFuncionario(NoArv *cadastro)
 {
-    // Continuar daqui
+    int idade;
+    int cargoOps;
+    char nome[40], cargo[25];
+    float salario;
+
+    system("cls");
+    printf("\n ========| EDITAR CADASTRO |========");
+
+    // Nome
+    printf("\n\t Nome: ");
+    scanf(" %39[^\n]", nome);
+
+    // Cargo
+    do
+    {
+        printf("\n\t Cargo:");
+        printf("\n\t\t 1. ANALISTA DE SISTEMAS\n\t\t 2. ANALISTA DE SUPORTE\n\t\t 3. PROGRAMADOR\n\t\t 4. CONTADOR\n\t\t 5. ADMINISTRATIVO\n\t\t 6. GERENTE");
+        printf("\n\t Escolha uma opcao: ");
+        scanf("%d", &cargoOps);
+
+        switch(cargoOps)
+        {
+            case 1:
+                strcpy(cargo, "ANALISTA DE SISTEMAS");
+                break;
+            
+            case 2:
+                strcpy(cargo, "ANALISTA DE SUPORTE");
+                break;
+            
+            case 3:
+                strcpy(cargo, "PROGRAMADOR");
+                break;
+            
+            case 4:
+                strcpy(cargo, "CONTADOR");
+                break;
+            
+            case 5:
+                strcpy(cargo, "ADMINISTRATIVO");
+                break;
+            
+            case 6:
+                strcpy(cargo, "GERENTE");
+                break;
+            
+            default:
+                printf("\n\n ERRO: Valor invalido inserido...");
+        }
+    } while (cargoOps <= 0 || cargoOps > 6);
+    
+    // Idade
+    do
+    {
+        printf("\n\t Idade: ");
+        scanf("%d", &idade);
+
+        if(idade < 18 || idade > 100)
+        {
+            printf("\n\n ERRO: Idade fora do padrao permitido...");
+        }
+
+    } while (idade < 18 || idade > 100);
+
+    // Salário
+    printf("\n\t Salario: ");
+    scanf("%f", &salario);
+
+    strcpy(cadastro->nome, nome);
+    strcpy(cadastro->cargo, cargo);
+    cadastro->idade = idade;
+    cadastro->salario = salario;
+
+    FormataNo(cadastro);
 }
 
 void BuscaFuncionario(Arv *a)
@@ -153,7 +226,7 @@ void BuscaFuncionario(Arv *a)
         printf("\n\t Salario: %.2f", cadastro->salario);
 
         printf("\n\n Deseja alterar as informacoes do funcionario? [S|N]: ");
-        scanf("%c", &input);
+        scanf(" %c", &input);
         input = toupper(input);
 
         if(input == 'S')
@@ -165,6 +238,80 @@ void BuscaFuncionario(Arv *a)
     {
         printf("\n\n ERRO: Registro nao encontrado no sistema...");
     }
+}
+
+void BuscaCargoAux(NoArv *pai, char cargo[])
+{
+    if(pai != NULL)
+    {
+        if(strcmp(pai->cargo, cargo) == 0)
+        {
+            printf("\n %d", pai->registro);
+            printf("\t%s", pai->nome);
+            printf("\t%s", pai->cargo);
+            printf("\t%d", pai->idade);
+            printf("\t%.2f", pai->salario);
+        }
+
+        BuscaCargoAux(pai->esq, cargo);
+        BuscaCargoAux(pai->dir, cargo);
+    }
+}
+
+void BuscaCargo(NoArv *pai)
+{
+    int input, cargoLen;
+    char cargo[25];
+
+    do
+    {
+        system("cls");
+        printf("\n ========| BUSCA POR CARGO |========");
+        printf("\n\t Cargo:");
+        printf("\n\t\t 1. ANALISTA DE SISTEMAS\n\t\t 2. ANALISTA DE SUPORTE\n\t\t 3. PROGRAMADOR\n\t\t 4. CONTADOR\n\t\t 5. ADMINISTRATIVO\n\t\t 6. GERENTE");
+        printf("\n\t Escolha uma opcao: ");
+        scanf("%d", &input);
+
+        switch(input)
+        {
+            case 1:
+                strcpy(cargo, "ANALISTA DE SISTEMAS");
+                break;
+            
+            case 2:
+                strcpy(cargo, "ANALISTA DE SUPORTE");
+                break;
+            
+            case 3:
+                strcpy(cargo, "PROGRAMADOR");
+                break;
+            
+            case 4:
+                strcpy(cargo, "CONTADOR");
+                break;
+            
+            case 5:
+                strcpy(cargo, "ADMINISTRATIVO");
+                break;
+            
+            case 6:
+                strcpy(cargo, "GERENTE");
+                break;
+            
+            default:
+                printf("\n\n ERRO: Valor invalido inserido...");
+        }
+    } while (input <= 0 || input > 6);
+
+     // Formatação do vetor cargo
+    cargoLen = strlen(cargo);
+    for(int i = cargoLen; i < 25; i++)
+    {
+        cargo[i] = ' ';
+    }
+    cargo[24] = '\0';
+
+    BuscaCargoAux(pai, cargo);
 }
 
 void Menu(Arv *a)
@@ -179,6 +326,7 @@ void Menu(Arv *a)
         printf("\n\t 3. Imprimir pos-ordem");
         printf("\n\t 4. Cadastrar novo funcionario");
         printf("\n\t 5. Buscar funcionario");
+        printf("\n\t 6. Busca por cargo");
         printf("\n\t 0. Sair");
         printf("\n\n\t Escolha uma opcao: ");
         scanf("%d", &input);
@@ -206,6 +354,10 @@ void Menu(Arv *a)
             
             case 5:
                 BuscaFuncionario(a);
+                break;
+
+            case 6:
+                BuscaCargo(a->raiz);
                 break;
 
             case 0:
