@@ -49,7 +49,6 @@ void NovoCadastro(Arv *a)
     system("cls");
     printf("\n ========| NOVO CADASTRO |========");
 
-    // Registro
     do
     {
         printf("\n\t Registro: ");
@@ -57,16 +56,14 @@ void NovoCadastro(Arv *a)
 
         if(registro < 1000 || registro > 9999)
         {
-            printf("\n\n ERRO: Registro invalido...");
+            printf("\n\n ERRO: O registro deve conter 4 digitos...");
         }
 
     } while (registro < 1000 || registro > 9999);
 
-    // Nome
     printf("\n\t Nome: ");
     scanf(" %39[^\n]", nome);
 
-    // Cargo
     do
     {
         printf("\n\t Cargo:");
@@ -105,7 +102,6 @@ void NovoCadastro(Arv *a)
         }
     } while (cargoOps <= 0 || cargoOps > 6);
     
-    // Idade
     do
     {
         printf("\n\t Idade: ");
@@ -118,7 +114,6 @@ void NovoCadastro(Arv *a)
 
     } while (idade < 18 || idade > 100);
 
-    // Salário
     printf("\n\t Salario: ");
     scanf("%f", &salario);
 
@@ -135,11 +130,9 @@ void EditarFuncionario(NoArv *cadastro)
     system("cls");
     printf("\n ========| EDITAR CADASTRO |========");
 
-    // Nome
     printf("\n\t Nome: ");
     scanf(" %39[^\n]", nome);
 
-    // Cargo
     do
     {
         printf("\n\t Cargo:");
@@ -178,7 +171,6 @@ void EditarFuncionario(NoArv *cadastro)
         }
     } while (cargoOps <= 0 || cargoOps > 6);
     
-    // Idade
     do
     {
         printf("\n\t Idade: ");
@@ -206,7 +198,7 @@ void EditarFuncionario(NoArv *cadastro)
 void BuscaFuncionario(Arv *a)
 {
     int registro;
-    char input;
+    int input;
     NoArv *cadastro;
 
     system("cls");
@@ -225,13 +217,22 @@ void BuscaFuncionario(Arv *a)
         printf("\n\t Idade: %d", cadastro->idade);
         printf("\n\t Salario: %.2f", cadastro->salario);
 
-        printf("\n\n Deseja alterar as informacoes do funcionario? [S|N]: ");
-        scanf(" %c", &input);
-        input = toupper(input);
-
-        if(input == 'S')
+        printf("\n\n Escolha uma opcao:");
+        printf("\n\t 1. Editar informacoes \n\t 2. Remover cadastro \n\t 0. Voltar para o menu\n");
+        scanf(" %d", &input);
+        
+        switch(input)
         {
-            EditarFuncionario(cadastro);
+            case 1:
+                EditarFuncionario(cadastro);
+                break;
+            
+            case 2:
+                RemoveNo(a, registro);
+                break;
+            
+            default:
+                break;
         }
 
     } else
@@ -303,7 +304,6 @@ void BuscaCargo(NoArv *pai)
         }
     } while (input <= 0 || input > 6);
 
-     // Formatação do vetor cargo
     cargoLen = strlen(cargo);
     for(int i = cargoLen; i < 25; i++)
     {
@@ -314,9 +314,97 @@ void BuscaCargo(NoArv *pai)
     BuscaCargoAux(pai, cargo);
 }
 
+void BuscaIdadeAux(NoArv *pai, NoArv **novo, NoArv **velho)
+{
+    if(pai != NULL)
+    {
+        if(*novo == NULL || pai->idade < (*novo)->idade)
+        {
+            *novo = pai;
+        }
+
+        if(*velho == NULL || pai->idade > (*velho)->idade)
+        {
+            *velho = pai;
+        }
+
+        BuscaIdadeAux(pai->esq, novo, velho);
+        BuscaIdadeAux(pai->dir, novo, velho);
+    }
+}
+
+void BuscaIdade(NoArv *pai, NoArv **novo, NoArv **velho)
+{
+    *novo = NULL;
+    *velho = NULL;
+    BuscaIdadeAux(pai, novo, velho);
+
+    system("cls");
+    printf("\n ========| BUSCA POR IDADE |========");
+    printf("\n\n Funcionario mais novo:");
+    printf("\n\t Registro: %d", (*novo)->registro);
+    printf("\n\t Nome: %s", (*novo)->nome);
+    printf("\n\t Cargo: %s", (*novo)->cargo);
+    printf("\n\t Idade: %d", (*novo)->idade);
+    printf("\n\t Salario: %.2f", (*novo)->salario);
+
+    printf("\n\n Funcionario mais velho:");
+    printf("\n\t Registro: %d", (*velho)->registro);
+    printf("\n\t Nome: %s", (*velho)->nome);
+    printf("\n\t Cargo: %s", (*velho)->cargo);
+    printf("\n\t Idade: %d", (*velho)->idade);
+    printf("\n\t Salario: %.2f", (*velho)->salario);
+}
+
+int ContarRegistro(NoArv *no)
+{
+    if(no == NULL)
+    {
+        return 0;
+    }
+
+    return 1 + ContarRegistro(no->esq) + ContarRegistro(no->dir);
+}
+
+void SalvarDados(NoArv *no, FILE *ARQ)
+{
+    if(no != NULL)
+    {
+        SalvarDados(no->esq, ARQ);
+
+        fprintf(ARQ, "%d ", no->registro);
+        fprintf(ARQ, "%s", no->nome);
+        fprintf(ARQ, "%d ", no->idade);
+        fprintf(ARQ, "%s", no->cargo);
+        fprintf(ARQ, "%.2f\n", no->salario);
+
+        SalvarDados(no->dir, ARQ);
+    }
+}
+
+void EncerrarPrograma(Arv *a)
+{
+    FILE *ARQ = fopen("Dados.txt", "w");
+    int n;
+
+    if(ARQ == NULL)
+    {
+        printf("\n\n\n\t\t\t\t=> ERRO NA ABERTURA DO ARQUIVO <=\n\n");
+        system("pause");
+        exit(0);
+    }
+
+    n = ContarRegistro(a->raiz);
+    fprintf(ARQ, "%d\n", n);
+
+    SalvarDados(a->raiz, ARQ);
+    fclose(ARQ);
+}
+
 void Menu(Arv *a)
 {
     int input;
+    NoArv *maisNovo, *maisVelho;
 
     do
     {
@@ -327,6 +415,7 @@ void Menu(Arv *a)
         printf("\n\t 4. Cadastrar novo funcionario");
         printf("\n\t 5. Buscar funcionario");
         printf("\n\t 6. Busca por cargo");
+        printf("\n\t 7. Busca por idade");
         printf("\n\t 0. Sair");
         printf("\n\n\t Escolha uma opcao: ");
         scanf("%d", &input);
@@ -360,6 +449,10 @@ void Menu(Arv *a)
                 BuscaCargo(a->raiz);
                 break;
 
+            case 7:
+                BuscaIdade(a->raiz, &maisNovo, &maisVelho);
+                break;
+
             case 0:
                 printf("\n\n Encerrando o programa...");
                 break;
@@ -371,14 +464,14 @@ void Menu(Arv *a)
     } while (input != 0);
 }
 
-//=================================================================================================
-// Main
 int main()
 {
     Arv *a = CriaArvore();
 
     LeituraARQ(a);
     Menu(a);
+
+    EncerrarPrograma(a);
     
     return 0;
 }

@@ -41,7 +41,6 @@ void FormataNo(NoArv *no)
 {
     int nomeLen, cargoLen;
 
-    // Formatação do vetor nome
     nomeLen = strlen(no->nome);
     for(int i = nomeLen; i < TAM_NOME; i++)
     {
@@ -49,7 +48,6 @@ void FormataNo(NoArv *no)
     }
     no->nome[39] = '\0';
 
-    // Formatação do vetor cargo
     cargoLen = strlen(no->cargo);
     for(int i = cargoLen; i < TAM_CARGO; i++)
     {
@@ -139,22 +137,75 @@ void InsereArv(Arv *a, int registro, char nome[], char cargo[], int idade, float
 
 NoArv *BuscaArv(NoArv *no, int registro) 
 {
-    // Se o nó atual é NULL ou o registro é encontrado
     if (no == NULL || no->registro == registro) 
     {
         return no;
     }
 
-    // Se o registro que estamos buscando é menor que o registro do nó atual,
-    // buscamos na subárvore esquerda
     if (registro < no->registro) 
     {
         return BuscaArv(no->esq, registro);
     }
 
-    // Se o registro que estamos buscando é maior que o registro do nó atual,
-    // buscamos na subárvore direita
     return BuscaArv(no->dir, registro);
+}
+
+NoArv *RemoveAux(NoArv *no, int registro)
+{
+    if (no == NULL) 
+    {
+        return no;
+    }
+
+    if (registro < no->registro) 
+    {
+        no->esq = RemoveAux(no->esq, registro);
+    }
+    else if (registro > no->registro) 
+    {
+        no->dir = RemoveAux(no->dir, registro);
+    }
+    else
+    {
+        if (no->esq == NULL && no->dir == NULL) 
+        {
+            free(no);
+            return NULL;
+        }
+        else if (no->esq == NULL) 
+        {
+            NoArv *temp = no->dir;
+            free(no);
+            return temp;
+        }
+        else if (no->dir == NULL) 
+        {
+            NoArv *temp = no->esq;
+            free(no);
+            return temp;
+        }
+        else {
+            NoArv *sucessor = no->dir;
+            while (sucessor->esq != NULL) 
+            {
+                sucessor = sucessor->esq;
+            }
+
+            no->registro = sucessor->registro;
+            strcpy(no->nome, sucessor->nome);
+            strcpy(no->cargo, sucessor->cargo);
+            no->idade = sucessor->idade;
+            no->salario = sucessor->salario;
+
+            no->dir = RemoveAux(no->dir, sucessor->registro);
+        }
+    }
+    return no;
+}
+
+void RemoveNo(Arv *a, int registro)
+{
+    a->raiz = RemoveAux(a->raiz, registro);
 }
 
 void Imprime_PreOrder(NoArv *pai)
